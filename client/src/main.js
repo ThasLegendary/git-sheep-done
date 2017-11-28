@@ -6,16 +6,17 @@ import router from './router'
 
 import VueAxios from 'vue-axios'
 import VueAuthenticate from 'vue-authenticate'
-import axios from 'axios';
+import axios from 'axios'
 
 Vue.use(VueAxios, axios)
 Vue.use(VueAuthenticate, {
-  baseUrl: 'http://localhost:3000', // Your API domain
-  
+  baseUrl: 'http://localhost:8081', // server host
+
   providers: {
     github: {
-      clientId: '',
-      redirectUri: 'http://localhost:8080/auth/callback' // Your client app URL
+      clientId: 'e7bd6ad5880748a3ef34',
+      redirectUri: 'http://localhost:8082/auth/callback', // client app
+      scope: 'repo,user'
     }
   }
 })
