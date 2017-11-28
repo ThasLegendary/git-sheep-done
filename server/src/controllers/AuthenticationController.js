@@ -13,7 +13,7 @@ function allowCrossDomain (req, res, next) {
 }
 */
 
-function parseQueryString (str) {
+function parseQueryString(str) {
   let obj = {}
   let key
   let value;
@@ -28,7 +28,7 @@ function parseQueryString (str) {
 }
 
 module.exports = {
-  async register (req, res) {
+  async register(req, res) {
     Axios.post('https://github.com/login/oauth/access_token', {
       client_id: config.auth.github.clientId,
       client_secret: config.auth.github.clientSecret,
@@ -38,24 +38,23 @@ module.exports = {
       grant_type: 'authorization_code'
     }, { 'Content-Type': 'application/json' }).then(function (response) {
       var responseJson = parseQueryString(response.data)
-      console.log(responseJson)
       if (responseJson.error) {
         res.status(500).json({ error: responseJson.error })
       } else {
+        /*
+      try {
+        const user = await User.create()
+        res.send(user.toJSON())
+      } catch (err) {
+        res.status(400).send({
+          error: 'User creation failed'
+        })
+      }
+      */
         res.json(responseJson)
       }
     }).catch(function (err) {
       res.status(500).json(err)
     })
-    /*
-    try {
-      const user = await User.create()
-      res.send(user.toJSON())
-    } catch (err) {
-      res.status(400).send({
-        error: 'User creation failed'
-      })
-    }
-    */
   }
 }
