@@ -1,34 +1,40 @@
-const axios = require('axios')
-const query = `query {
-    viewer {
-    login,
-        avatarUrl,
-        contributedRepositories(first: 100) {
-        edges {
-            node {
-                name,
-                    description
-                owner {
-                    login
-                }
-            }
-        }
-    }
-    }
-    }`
+var fetch = require('node-fetch');
 
-let options = {
-    url: 'https://api.github.com/graphql',
-    method: 'post',
-    headers: {
-        'Content-Type': 'application/graphql',
-        'Authorization': 'Bearer ' + token
-    },
-    data: query
+class Viewer {
+    constructor(name, avatar) {
+        this.name = name;
+        this.avatar = avatar;
+    }
+}
+
+class ViewerService {
+
+    static getViewerDetails(token, callback) {
+        const query = 'query { viewer { login, avatarUrl} }'
+
+        var request = {
+            method: 'POST',
+            body: JSON.stringify({ query }),
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        };
+
+        function handleErrors(response) {
+            if (!response.ok) {
+                throw Error(response.statusText);
+            }
+            return response;
+        }
+
+        fetch('https://api.github.com/graphql', request)
+            .then(handleErrors)
+            .then((resp) => resp.json()) // Transform the data into json
+            .then(function (json) {
+                callback(new Viewer(json.data.viewer.login, json.data.viewer.avatarUrl))
+            })
+            .catch(error => console.error(error));
+    }
 };
 
-axios(options).then(res => {
-    console.log(res.data)
-}).catch(err => {
-    console.log(err)
-})
+module.exports = UserService;

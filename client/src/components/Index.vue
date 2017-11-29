@@ -15,12 +15,18 @@ export default {
   },
   methods: {
     authenticate: function (provider) {
-      this.$auth.authenticate(provider).then(function () {
+      this.$auth.authenticate(provider).then(() => {
         // Execute application logic after successful social authentication
+        if (this.$auth.isAuthenticated()) {
+          this.$router.push({ name: 'Home'})
+        } else {
+          this.$router.push({ name: 'Index'})
+        }        
       })
     }
   }
 }
 </script>
 
+<style>
 </style>

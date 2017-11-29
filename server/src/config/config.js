@@ -12,8 +12,8 @@ module.exports = {
   },
   auth: {
     github: {
-      clientId: '',
-      clientSecret: ''
+      clientId: 'e7bd6ad5880748a3ef34',
+      clientSecret: '27e09aa460e4734ac590e72a18f7ee90a9ad7cb0'
     }
   }
 }

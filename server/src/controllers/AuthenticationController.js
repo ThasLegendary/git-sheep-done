@@ -2,16 +2,7 @@
 
 var Axios = require('axios')
 var config = require('../config/config.js')
-/*
-app.use(allowCrossDomain);
-
-function allowCrossDomain (req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
-  res.header('Access-Control-Allow-Headers', 'Content-Type')
-  next()
-}
-*/
+var ViewerService = require('../services/ViewerService')
 
 function parseQueryString(str) {
   let obj = {}
@@ -38,9 +29,16 @@ module.exports = {
       grant_type: 'authorization_code'
     }, { 'Content-Type': 'application/json' }).then(function (response) {
       var responseJson = parseQueryString(response.data)
+      console.log(responseJson)
       if (responseJson.error) {
         res.status(500).json({ error: responseJson.error })
       } else {
+        // user is authenticated, retrieve its details
+        ViewerService.getViewerDetails(responseJson.access_token, function (viewer) {
+          console.log(viewer)
+        });
+
+        // create the user in the database if not existing
         /*
       try {
         const user = await User.create()
@@ -51,9 +49,11 @@ module.exports = {
         })
       }
       */
+
         res.json(responseJson)
       }
     }).catch(function (err) {
+      console.error(err);
       res.status(500).json(err)
     })
   }

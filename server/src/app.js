@@ -10,6 +10,11 @@ app.use(morgan('combined'))
 app.use(bodyParser.json())
 app.use(cors())
 
+process.on('unhandledRejection', function(reason, p) {
+  console.log("Unhandled Rejection:", reason.stack);
+  process.exit(1);
+});
+
 require('./routes.js')(app)
 
 sequelize.sync().then(
