@@ -15,13 +15,21 @@ export default {
   },
   methods: {
     authenticate: function (provider) {
-      this.$auth.authenticate(provider).then(() => {
+      this.$auth.authenticate(provider).then((authResponse) => {        
         // Execute application logic after successful social authentication
         if (this.$auth.isAuthenticated()) {
+          console.log(authResponse.data)
+
+          this.$store.dispatch('setToken', authResponse.data.token)          
+          this.$store.dispatch('setUser', {
+            name: authResponse.data.name, 
+            avatar: authResponse.data.avatar
+          })
+
           this.$router.push({ name: 'Home'})
         } else {
           this.$router.push({ name: 'Index'})
-        }        
+        }
       })
     }
   }

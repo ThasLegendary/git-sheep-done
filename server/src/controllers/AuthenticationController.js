@@ -1,10 +1,20 @@
 // const { User } = require('../models')
 
 var Axios = require('axios')
-var config = require('../config/config.js')
+var config = require('../config/config')
 var ViewerService = require('../services/ViewerService')
 
-function parseQueryString(str) {
+var {User} = require('../models')
+var jwt = require('jsonwebtoken')
+
+function jwtSignUser (user) {
+  const ONE_WEEK = 60 * 60 * 24 * 7
+  return jwt.sign(user, config.authentication.jwtSecret, {
+    expiresIn: ONE_WEEK
+  })
+}
+
+function parseQueryString (str) {
   let obj = {}
   let key
   let value;
@@ -19,7 +29,8 @@ function parseQueryString(str) {
 }
 
 module.exports = {
-  async register(req, res) {
+
+  async register (req, res) {
     Axios.post('https://github.com/login/oauth/access_token', {
       client_id: config.auth.github.clientId,
       client_secret: config.auth.github.clientSecret,
@@ -36,24 +47,34 @@ module.exports = {
         // user is authenticated, retrieve its details
         ViewerService.getViewerDetails(responseJson.access_token, function (viewer) {
           console.log(viewer)
-        });
 
-        // create the user in the database if not existing
-        /*
-      try {
-        const user = await User.create()
-        res.send(user.toJSON())
-      } catch (err) {
-        res.status(400).send({
-          error: 'User creation failed'
+          // create the user in the database if not existing
+          try {
+            const user = User.upsert({
+              name: viewer.name,
+              avatar: viewer.avatar,
+              token: responseJson.access_token
+            })
+
+            const userJson = user.toJSON()
+
+            res.send({
+              name: viewer.name,
+              avatar: viewer.avatar,
+              token: jwtSignUser(userJson)
+            })
+          } catch (err) {
+            console.log(err)
+            res.status(400).send({
+              error: 'This email account is already in use.'
+            })
+          }
         })
-      }
-      */
 
-        res.json(responseJson)
+        // res.json(responseJson)
       }
     }).catch(function (err) {
-      console.error(err);
+      console.error(err)
       res.status(500).json(err)
     })
   }

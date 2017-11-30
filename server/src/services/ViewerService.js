@@ -1,4 +1,4 @@
-var fetch = require('node-fetch');
+var fetch = require('node-fetch')
 
 class Viewer {
     constructor(name, avatar) {
@@ -37,4 +37,4 @@ class ViewerService {
     }
 };
 
-module.exports = UserService;
+module.exports = ViewerService;
