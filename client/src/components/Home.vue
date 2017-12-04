@@ -4,7 +4,7 @@
     <div id="repos-config">
       <ul id="repos">
         <li v-for="repo in repos">
-          {{ repo.name }}
+          {{ repo.name }} {{repo.description}} {{repo.owner}}
         </li>
       </ul>
     </div>   
@@ -23,6 +23,7 @@ export default {
   },
   async mounted() {
     const apiResp = await RepoService.list()
+    console.log(apiResp)
     if (apiResp.error) {
 
     } else {

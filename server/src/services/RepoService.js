@@ -48,7 +48,7 @@ class RepoService {
     .then(function (json) {  
       var repos = new Array();
         json.data.viewer.repositories.edges.forEach(function (edge) {
-          var repo = new Repo(edge.node.name, edge.node.description, edge.node.owner.name);
+          var repo = new Repo(edge.node.name, edge.node.description, edge.node.owner.login);          
           repos.push(repo)
         });
 
