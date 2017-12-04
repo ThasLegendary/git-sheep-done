@@ -61,7 +61,7 @@ module.exports = {
             res.send({
               name: viewer.name,
               avatar: viewer.avatar,
-              token: jwtSignUser(userJson)
+              token: jwtSignUser({name: viewer.name})
             })
           } catch (err) {
             console.log(err)

@@ -1,14 +1,37 @@
 <template>
-  <div class="home">
-    <h1></h1> 
+  <div class="content-wrapper">
+    <h1></h1>
+    <div id="repos-config">
+      <ul id="repos">
+        <li v-for="repo in repos">
+          {{ repo.name }}
+        </li>
+      </ul>
+    </div>   
   </div>
 </template>
 
 <script>
+import RepoService from "@/services/RepoService";
+
 export default {
-  name: 'Home'
-}
+  name: "Home",
+  data() {
+    return {
+      repos: null
+    };
+  },
+  async mounted() {
+    const apiResp = await RepoService.list()
+    if (apiResp.error) {
+
+    } else {
+      this.repos = apiResp.data
+    }    
+  }
+};
 </script>
 
 <style>
+
 </style>
