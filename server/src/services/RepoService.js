@@ -1,4 +1,4 @@
-var fetch = require('node-fetch')
+const Request = require('./GitHubService')
 
 class Repo {
   constructor (name, description, owner) {
@@ -10,9 +10,7 @@ class Repo {
 
 class RepoService {
   static async getUserRepos (token, callback) {
-    const query = `
-    query {
-      viewer {
+    const query = `viewer {
         repositories(first: 100, affiliations: [OWNER, COLLABORATOR, ORGANIZATION_MEMBER], orderBy: { field: NAME, direction: ASC }) {
           edges {
             node {
@@ -24,55 +22,28 @@ class RepoService {
             }
           }
         }
-      }
-    }`
-
-    var request = {
-      method: 'POST',
-      body: JSON.stringify({ query }),
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      }`
+      
+    const params = {
+      token: token,
+      query: query
     }
 
-    function handleErrors (response) {
-      if (!response.ok) {
-        throw Error(response.statusText)
+    var apiCallback = function (error, json) {
+      if (error) {
+        console.err(error)
       }
-      return response
-    }
-
-    fetch('https://api.github.com/graphql', request)
-      .then(handleErrors)
-      .then((resp) => resp.json()) // Transform the data into json
-      .then(function (json) {
-        var repos = []
-        json.data.viewer.repositories.edges.forEach(function (edge) {
-          var repo = new Repo(edge.node.name, edge.node.description, edge.node.owner.login);          
-          repos.push(repo)
-        })
-
-        callback(repos)
+      console.log(json)
+      var repos = []
+      json.data.viewer.repositories.edges.forEach(function (edge) {
+        var repo = new Repo(edge.node.name, edge.node.description, edge.node.owner.login);          
+        repos.push(repo)
       })
-      .catch(error => console.error(error))
-  }
 
-  static getRepoUsers () {
-    const query = `query {
-      repository(owner: "antoine-sticky", name: "delivery-engine") {
-        assignableUsers(first:100) {
-          edges {
-            node {
-              name,
-              login,
-              avatarUrl
-            }
-          }
-        }
-      }
-    }`
+      callback(repos)
+    }
 
-
+    Request(params, apiCallback)
   }
 };
 

@@ -6,11 +6,5 @@ module.exports = {
     RepoService.getUserRepos(req.user.token, function (repos) {
       res.send(repos)
     })
-  },
-
-
-  async setRepo (req, res) {
-    req.repoId
-    req.enabled
   }
 }

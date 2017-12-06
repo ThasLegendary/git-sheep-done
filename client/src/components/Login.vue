@@ -22,6 +22,7 @@ export default {
 
           this.$store.dispatch('setToken', authResponse.data.token)          
           this.$store.dispatch('setUser', {
+            login: authResponse.data.login,
             name: authResponse.data.name, 
             avatar: authResponse.data.avatar
           })

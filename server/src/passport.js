@@ -15,7 +15,7 @@ passport.use(
       console.log(jwtPayload)
       const user = await User.findOne({
         where: {
-          name: jwtPayload.name
+          login: jwtPayload.id
         }
       })
       if (!user) {

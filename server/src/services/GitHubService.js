@@ -30,8 +30,11 @@ function Request (options, cb) {
 
   req.post('/graphql', payloadString)
     .then(function (response) {
-      console.log(response)
-      cb(null, response)
+      if (response.errors) {
+        console.log(errors)
+        cb(errors)
+      }
+      cb(null, response.data)
     })
     .catch(function (error) {
       console.log(error)

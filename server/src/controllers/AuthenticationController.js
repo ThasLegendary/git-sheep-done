@@ -2,7 +2,7 @@
 
 var Axios = require('axios')
 var config = require('../config/config')
-var ViewerService = require('../services/ViewerService')
+var UserService = require('../services/UserService')
 
 var {User} = require('../models')
 var jwt = require('jsonwebtoken')
@@ -45,30 +45,24 @@ module.exports = {
         res.status(500).json({ error: responseJson.error })
       } else {
         // user is authenticated, retrieve its details
-        ViewerService.getViewerDetails(responseJson.access_token, function (viewer) {
+        UserService.getViewerDetails(responseJson.access_token, function (viewer) {
           console.log(viewer)
 
-          // create the user in the database if not existing
-          try {
-            const user = User.upsert({
-              name: viewer.name,
-              avatar: viewer.avatar,
-              token: responseJson.access_token
-            })
+          // create the user or update user
+          const user = User.upsert({
+            login: viewer.login,
+            name: viewer.name,
+            avatar: viewer.avatar,
+            token: responseJson.access_token
+          })
 
-            const userJson = user.toJSON()
-
-            res.send({
-              name: viewer.name,
-              avatar: viewer.avatar,
-              token: jwtSignUser({name: viewer.name})
-            })
-          } catch (err) {
-            console.log(err)
-            res.status(400).send({
-              error: 'This email account is already in use.'
-            })
-          }
+          res.send({
+            login: viewer.login,
+            name: viewer.name,
+            avatar: viewer.avatar,
+            //TODO use id instead
+            token: jwtSignUser({id: viewer.login})
+          })
         })
 
         // res.json(responseJson)

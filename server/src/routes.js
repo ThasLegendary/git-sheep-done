@@ -33,7 +33,7 @@ module.exports = (app) => {
         req.user = user
         next()
       }
-    })(req, res, next)
+    }) (req, res, next)
   }
 
   app.get('/status', (req, res) => {
