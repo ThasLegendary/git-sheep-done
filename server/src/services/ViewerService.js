@@ -1,40 +1,26 @@
-var fetch = require('node-fetch')
+
+const Request = require('./GitHubService')
 
 class Viewer {
-    constructor(name, avatar) {
-        this.name = name;
-        this.avatar = avatar;
-    }
+  constructor (name, avatar) {
+    this.name = name
+    this.avatar = avatar
+  }
 }
 
 class ViewerService {
-
-    static getViewerDetails(token, callback) {
-        const query = 'query { viewer { login, avatarUrl} }'
-
-        var request = {
-            method: 'POST',
-            body: JSON.stringify({ query }),
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-        };
-
-        function handleErrors(response) {
-            if (!response.ok) {
-                throw Error(response.statusText);
-            }
-            return response;
-        }
-
-        fetch('https://api.github.com/graphql', request)
-            .then(handleErrors)
-            .then((resp) => resp.json()) // Transform the data into json
-            .then(function (json) {
-                callback(new Viewer(json.data.viewer.login, json.data.viewer.avatarUrl))
-            })
-            .catch(error => console.error(error));
+  static getViewerDetails (token, callback) {
+    const params = {
+      token: token,
+      query: '{ viewer { login, avatarUrl} }'
     }
-};
 
-module.exports = ViewerService;
+    var apiCallback = function (error, json) {
+      callback(new Viewer(json.data.viewer.login, json.data.viewer.avatarUrl))
+    }
+
+    Request(params, apiCallback)
+  }
+}
+
+module.exports = ViewerService
