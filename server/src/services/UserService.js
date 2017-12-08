@@ -1,7 +1,8 @@
 const Request = require('./GitHubService')
 
 class User {
-  constructor (login, name, avatar) {
+  constructor (id, login, name, avatar) {
+    this.id = id
     this.login = login
     this.name = name
     this.avatar = avatar
@@ -13,7 +14,7 @@ class UserService {
     return new Promise(function (resolve, reject) {
       const params = {
         token: token,
-        query: '{viewer { login, name, avatarUrl}}'
+        query: '{viewer { databaseId, login, name, avatarUrl}}'
       }
 
       Request(params)
@@ -24,7 +25,7 @@ class UserService {
           if (json.errors) {
             reject(json.errors)
           } else {
-            resolve(new User(json.viewer.login, json.viewer.name, json.viewer.avatarUrl))
+            resolve(new User(json.viewer.databaseId, json.viewer.login, json.viewer.name, json.viewer.avatarUrl))
           }
         })
         .catch(function (error) {

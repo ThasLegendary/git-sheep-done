@@ -52,6 +52,7 @@ module.exports = {
 
               // create the user or update user
               User.upsert({
+                id: viewer.id,
                 login: viewer.login,
                 name: viewer.name,
                 avatar: viewer.avatar,
@@ -62,8 +63,7 @@ module.exports = {
                 login: viewer.login,
                 name: viewer.name,
                 avatar: viewer.avatar,
-                // TODO use id instead
-                token: jwtSignUser({id: viewer.login})
+                token: jwtSignUser({id: viewer.id})
               })
             })
             .catch(function (err) {
