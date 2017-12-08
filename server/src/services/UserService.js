@@ -10,51 +10,72 @@ class User {
 
 class UserService {
   static getViewerDetails (token, callback) {
-    const params = {
-      token: token,
-      query: '{viewer { login, name, avatarUrl}}'
-    }
+    return new Promise(function (resolve, reject) {
+      const params = {
+        token: token,
+        query: '{viewer { login, name, avatarUrl}}'
+      }
 
-    var apiCallback = function (error, json) {
-      callback(new User(json.viewer.login, json.viewer.name, json.viewer.avatarUrl))
-    }
+      Request(params)
+        .then(function (response) {
+          var json = response.data.data
+          console.debug(json)
 
-    Request(params, apiCallback)
+          if (json.errors) {
+            reject(json.errors)
+          } else {
+            resolve(new User(json.viewer.login, json.viewer.name, json.viewer.avatarUrl))
+          }
+        })
+        .catch(function (error) {
+          reject(error)
+        })
+    })
   }
 
-  static getRepoUsers (token, owner, repoName, callback) {
-    const query = `repository(owner: $owner, name: $repo) {
-        assignableUsers(first:100) {
-          edges {
-            node {
-              name,
-              login,
-              avatarUrl
+  static getRepoUsers (token, owner, repoName) {
+    return new Promise(function (resolve, reject) {
+      const query = `repository(owner: $owner, name: $repo) {
+          assignableUsers(first:100) {
+            edges {
+              node {
+                name,
+                login,
+                avatarUrl
+              }
             }
           }
+        }`
+
+      const params = {
+        token: token,
+        query: query,
+        variables: {
+          owner: owner,
+          repo: repoName
         }
-      }`
-
-    const params = {
-      token: token,
-      query: query,
-      variables: {
-        owner: owner,
-        repo: repoName
       }
-    }
 
-    var apiCallback = function (error, json) {
-      var repos = []
-      json.data.viewer.repositories.edges.forEach(function (edge) {
-        var repo = new Repo(edge.node.name, edge.node.description, edge.node.owner.login);          
-        repos.push(repo)
-      })
+      Request(params)
+        .then(function (response) {
+          var json = response.data.data
+          console.debug(json)
 
-      callback(repos)
-    }
-
-    Request(params, apiCallback)
+          if (json.errors) {
+            reject(json.errors)
+          } else {
+            var users = []
+            json.viewer.repositories.edges.forEach(function (edge) {
+              var user = new User(edge.node.login, edge.node.name, edge.node.owner.avatar, null);
+              users.push(user)
+            })
+            resolve(users)
+          }
+        })
+        .catch(function (error) {
+          reject(error)
+        })
+    })
   }
 }
 

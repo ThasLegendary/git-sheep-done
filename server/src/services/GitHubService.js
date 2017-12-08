@@ -1,6 +1,6 @@
 var Axios = require('axios')
 
-function Request (options, cb) {
+function Request (options) {
   var token = options.token
   var query = options.query
   var variables = options.variables || {}
@@ -30,19 +30,7 @@ function Request (options, cb) {
     }
   })
 
-  req.post('/graphql', payloadString)
-    .then(function (response) {
-      if (response.data.errors) {
-        console.log(response.data.errors)
-        cb(response.data.errors)
-      }
-      console.log(response.data.data)
-      cb(null, response.data.data)
-    })
-    .catch(function (error) {
-      console.log(error)
-      cb(error)
-    })
+  return req.post('/graphql', payloadString)
 }
 
 module.exports = Request

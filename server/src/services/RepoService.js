@@ -1,7 +1,8 @@
 const Request = require('./GitHubService')
 
 class Repo {
-  constructor (name, description, owner) {
+  constructor (id, name, description, owner) {
+    this.id = id
     this.name = name
     this.description = description
     this.owner = owner
@@ -10,42 +11,49 @@ class Repo {
 
 class RepoService {
   static async getUserRepos (token, callback) {
-    const query = `{
-      viewer {
-        repositories(first: 100, affiliations: [OWNER, COLLABORATOR, ORGANIZATION_MEMBER], orderBy: { field: NAME, direction: ASC }) {
-          edges {
-            node {
-              name,
-              description
-              owner {
-                login
+    return new Promise(function (resolve, reject) {
+      const query = `{
+        viewer {
+          repositories(first: 100, affiliations: [OWNER, COLLABORATOR, ORGANIZATION_MEMBER], orderBy: { field: NAME, direction: ASC }) {
+            edges {
+              node {
+                id,
+                name,
+                description
+                owner {
+                  login
+                }
               }
             }
           }
         }
+      }`
+
+      const params = {
+        token: token,
+        query: query
       }
-    }`
 
-    const params = {
-      token: token,
-      query: query
-    }
+      Request(params)
+        .then(function (response) {
+          var json = response.data.data
+          console.debug(json)
 
-    var apiCallback = function (error, json) {
-      if (error) {
-        console.err(error)
-      }
-      console.log(json)
-      var repos = []
-      json.viewer.repositories.edges.forEach(function (edge) {
-        var repo = new Repo(edge.node.name, edge.node.description, edge.node.owner.login);          
-        repos.push(repo)
-      })
-
-      callback(repos)
-    }
-
-    Request(params, apiCallback)
+          if (json.errors) {
+            reject(json.errors)
+          } else {
+            var repos = []
+            json.viewer.repositories.edges.forEach(function (edge) {
+              var repo = new Repo(edge.node.id, edge.node.name, edge.node.description, edge.node.owner.login)
+              repos.push(repo)
+            })
+            resolve(repos)
+          }
+        })
+        .catch(function (error) {
+          reject(error)
+        })
+    })
   }
 };
 

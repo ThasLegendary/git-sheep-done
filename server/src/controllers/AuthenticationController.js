@@ -38,38 +38,43 @@ module.exports = {
       redirect_uri: req.body.redirectUri,
       state: req.body.state,
       grant_type: 'authorization_code'
-    }, { 'Content-Type': 'application/json' }).then(function (response) {
-      var responseJson = parseQueryString(response.data)
-      console.log(responseJson)
-      if (responseJson.error) {
-        res.status(500).json({ error: responseJson.error })
-      } else {
-        // user is authenticated, retrieve its details
-        UserService.getViewerDetails(responseJson.access_token, function (viewer) {
-          console.log(viewer)
+    }, { 'Content-Type': 'application/json' })
+      .then(function (response) {
+        var responseJson = parseQueryString(response.data)
+        console.log(responseJson)
+        if (responseJson.error) {
+          res.status(500).json({ error: responseJson.error })
+        } else {
+          // user is authenticated, retrieve its details
+          UserService.getViewerDetails(responseJson.access_token)
+            .then(function (viewer) {
+              console.log(viewer)
 
-          // create the user or update user
-          User.upsert({
-            login: viewer.login,
-            name: viewer.name,
-            avatar: viewer.avatar,
-            token: responseJson.access_token
-          })
+              // create the user or update user
+              User.upsert({
+                login: viewer.login,
+                name: viewer.name,
+                avatar: viewer.avatar,
+                token: responseJson.access_token
+              })
 
-          res.send({
-            login: viewer.login,
-            name: viewer.name,
-            avatar: viewer.avatar,
-            //TODO use id instead
-            token: jwtSignUser({id: viewer.login})
-          })
-        })
-
-        // res.json(responseJson)
-      }
-    }).catch(function (err) {
-      console.error(err)
-      res.status(500).json(err)
-    })
+              res.send({
+                login: viewer.login,
+                name: viewer.name,
+                avatar: viewer.avatar,
+                // TODO use id instead
+                token: jwtSignUser({id: viewer.login})
+              })
+            })
+            .catch(function (err) {
+              console.error(err)
+              res.status(500).json({error: 'viewer details failed to be retrieved'})
+            })
+        }
+      })
+      .catch(function (err) {
+        console.error(err)
+        res.status(500).json({error: 'authentication failed'})
+      })
   }
 }
