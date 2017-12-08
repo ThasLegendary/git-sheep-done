@@ -10,7 +10,8 @@ class Repo {
 
 class RepoService {
   static async getUserRepos (token, callback) {
-    const query = `viewer {
+    const query = `{
+      viewer {
         repositories(first: 100, affiliations: [OWNER, COLLABORATOR, ORGANIZATION_MEMBER], orderBy: { field: NAME, direction: ASC }) {
           edges {
             node {
@@ -22,8 +23,9 @@ class RepoService {
             }
           }
         }
-      }`
-      
+      }
+    }`
+
     const params = {
       token: token,
       query: query
@@ -35,7 +37,7 @@ class RepoService {
       }
       console.log(json)
       var repos = []
-      json.data.viewer.repositories.edges.forEach(function (edge) {
+      json.viewer.repositories.edges.forEach(function (edge) {
         var repo = new Repo(edge.node.name, edge.node.description, edge.node.owner.login);          
         repos.push(repo)
       })

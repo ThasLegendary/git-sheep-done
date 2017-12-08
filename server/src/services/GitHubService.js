@@ -18,6 +18,8 @@ function Request (options, cb) {
 
   var payloadString = JSON.stringify(payload)
 
+  console.log(payloadString)
+
   let req = Axios.create({
     baseURL: `https://api.github.com`,
     headers: {
@@ -30,11 +32,12 @@ function Request (options, cb) {
 
   req.post('/graphql', payloadString)
     .then(function (response) {
-      if (response.errors) {
-        console.log(errors)
-        cb(errors)
+      if (response.data.errors) {
+        console.log(response.data.errors)
+        cb(response.data.errors)
       }
-      cb(null, response.data)
+      console.log(response.data.data)
+      cb(null, response.data.data)
     })
     .catch(function (error) {
       console.log(error)

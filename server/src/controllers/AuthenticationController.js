@@ -49,7 +49,7 @@ module.exports = {
           console.log(viewer)
 
           // create the user or update user
-          const user = User.upsert({
+          User.upsert({
             login: viewer.login,
             name: viewer.name,
             avatar: viewer.avatar,

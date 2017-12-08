@@ -12,11 +12,11 @@ class UserService {
   static getViewerDetails (token, callback) {
     const params = {
       token: token,
-      query: '{ viewer { login, avatarUrl} }'
+      query: '{viewer { login, name, avatarUrl}}'
     }
 
     var apiCallback = function (error, json) {
-      callback(new User(json.data.viewer.login, json.data.viewer.name, json.data.viewer.avatarUrl))
+      callback(new User(json.viewer.login, json.viewer.name, json.viewer.avatarUrl))
     }
 
     Request(params, apiCallback)
