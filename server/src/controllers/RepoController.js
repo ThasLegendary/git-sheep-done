@@ -1,5 +1,5 @@
 var RepoService = require('../services/RepoService')
-var UserRepo = require('../models/UserRepo')
+var {UserRepo} = require('../models')
 
 module.exports = {
   // list all repos accessible by the user
@@ -9,6 +9,10 @@ module.exports = {
       UserRepo.findAll({ where: { userId: req.user.id } })
     ])
       .then(function (values) {
+        var repos = values[0]
+        var userRepos = values[1]
+        console.log(repos)
+        console.log(userRepos)
         res.send(repos)
       })
       .catch(function (err) {

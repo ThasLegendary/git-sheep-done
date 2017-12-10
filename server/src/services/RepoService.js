@@ -17,7 +17,7 @@ class RepoService {
           repositories(first: 100, affiliations: [OWNER, COLLABORATOR, ORGANIZATION_MEMBER], orderBy: { field: NAME, direction: ASC }) {
             edges {
               node {
-                id,
+                databaseId,
                 name,
                 description
                 owner {
@@ -44,7 +44,7 @@ class RepoService {
           } else {
             var repos = []
             json.viewer.repositories.edges.forEach(function (edge) {
-              var repo = new Repo(edge.node.id, edge.node.name, edge.node.description, edge.node.owner.login)
+              var repo = new Repo(edge.node.databaseId, edge.node.name, edge.node.description, edge.node.owner.login)
               repos.push(repo)
             })
             resolve(repos)
