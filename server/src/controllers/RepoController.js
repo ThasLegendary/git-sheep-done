@@ -19,5 +19,31 @@ module.exports = {
         console.error(err)
         res.status(500).json({error: 'Failed to retrieve user list'})
       })
+  },
+
+  async enableUserRepo (req, res) {
+    var promise
+    if (req.params.enable) {
+      promise = UserRepo.create({
+        userId: req.user.id,
+        repoId: req.params.repoId
+      })
+    } else {
+      promise = UserRepo.destroy({
+        where: {
+          userId: req.user.id,
+          repoId: req.params.repoId
+        }
+      })
+    }
+
+    promise
+      .then(function (values) {
+        res.send({status: 'ok'})
+      })
+      .catch(function (err) {
+        console.error(err)
+        res.status(500).json({error: 'Failed to set repo state'})
+      })
   }
 }

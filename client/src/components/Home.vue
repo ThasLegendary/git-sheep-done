@@ -1,13 +1,13 @@
 <template>
   <div class="content-wrapper">
-    <h1></h1>
+    <h1>Active repositories: {{totalActiveRepo}}</h1>
     <div class="repo-list">
       <div class="repo" v-for="repo in repos" v-bind:key="repo.id">
         <div class="title">
           {{repo.name}} {{repo.owner}}<br>
           <span>{{repo.description}}</span>
         </div>
-        <repo-toggle v-model="repo.enabled" :id="repo.id" @input="saveToogleState(repo.enabled)" />
+        <repo-toggle v-model="repo.enabled" :id="repo.id" @input="saveRepoStatus(repo.id, ...arguments)" />
       </div>
     </div>   
   </div>
@@ -24,7 +24,8 @@ export default {
   },
   data() {
     return {
-      repos: null
+      repos: null,
+      totalActiveRepo: 0
     };
   },
   async mounted() {
@@ -34,16 +35,20 @@ export default {
 
     } else {
       this.repos = apiResp.data
+      this.repos.forEach(function(repo) {
+        this.totalActiveRepo++
+      })
     }    
   },
   methods: {
-    saveToogleState: function (received) {
-      console.log(received)
-    }
-  },
-  watch: {
-    value(repos) {
-      console.log("watch " + repos)
+    saveRepoStatus: function(repoId, enabled) {
+      if (enabled) {
+        this.totalActiveRepo++
+      } else {
+        this.totalActiveRepo--
+      }
+      console.log(repoId + ' => ' + enabled)
+      // /repo/enable/:repoId/:enable
     }
   }
 };

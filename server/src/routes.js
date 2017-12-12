@@ -45,4 +45,6 @@ module.exports = (app) => {
   app.post('/auth/github', AuthenticationController.register)
 
   app.get('/repos', isAuthenticated, RepoController.getUserRepos)
+  
+  app.get('/repo/enable/:repoId/:enable', isAuthenticated, RepoController.enableUserRepo)
 }
