@@ -1,18 +1,29 @@
 var RepoService = require('../services/RepoService')
-var {UserRepo} = require('../models')
+var {Repo} = require('../models')
 
 module.exports = {
   // list all repos accessible by the user
   async getUserRepos (req, res) {
     Promise.all([
       RepoService.getUserRepos(req.user.token),
-      UserRepo.findAll({ where: { userId: req.user.id } })
+      req.user.getRepos()
     ])
       .then(function (values) {
         var repos = values[0]
         var userRepos = values[1]
-        console.log(repos)
-        console.log(userRepos)
+
+        console.debug(repos)
+        console.debug(userRepos)
+
+        for (var i = 0; i < repos.length; i++) {
+          repos[i].enabled = false
+          for (var j = 0; j < userRepos.length; j++) {
+            if (repos[i].id === userRepos[j].id) {
+              repos[i].enabled = true
+            }
+          }
+        }
+
         res.send(repos)
       })
       .catch(function (err) {
@@ -22,22 +33,21 @@ module.exports = {
   },
 
   async enableUserRepo (req, res) {
-    var promise
+    var promises = []
     if (req.params.enable) {
-      promise = UserRepo.create({
-        userId: req.user.id,
-        repoId: req.params.repoId
+      var repoCreation = Repo.upsert({
+        id: req.params.repoId
       })
+      promises.push(repoCreation)
+
+      var linkCreation = req.user.addRepo(req.params.repoId)
+      promises.push(linkCreation)
     } else {
-      promise = UserRepo.destroy({
-        where: {
-          userId: req.user.id,
-          repoId: req.params.repoId
-        }
-      })
+      var linkDeletion = req.user.removeRepo(req.params.repoId)
+      promises.push(linkDeletion)
     }
 
-    promise
+    Promise.all(promises)
       .then(function (values) {
         res.send({status: 'ok'})
       })

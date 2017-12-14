@@ -1,7 +1,7 @@
 <template>
-  <nav class="cd-nav" v-if="$store.state.isUserLoggedIn">
+  <nav v-if="$store.state.isUserLoggedIn">
     <div>
-      <a href="#0" class="cd-logo">
+      <a href="#0">
         <img src="https://img15.hostingpics.net/pics/141704noun227671cc.png" />
       </a></div>
     <div><a href="#0">Tour</a></div>
@@ -40,6 +40,10 @@ export default {
 </script>
 
 <style lang="scss">
+body {
+  font-family: 'Open Sans';
+}
+
 nav {
   background: #3e454c;
   display: flex;
@@ -51,8 +55,7 @@ nav {
   }
 
   div {
-    //border: 1px solid red;
-    margin: auto 1em auto 1em;
+    margin: auto 0 auto 1em;
 
     a {
       display: block;
@@ -72,7 +75,6 @@ nav {
     background: #2c3136;
     display: flex;
     height: 100%;
-    margin: auto 0 auto 1em;
 
     a {
       margin: auto 1em auto 1em; 
@@ -84,10 +86,11 @@ nav {
       }
     }
 
-    ul {
+    ul {      
       position: absolute;
       background: #2c3136;
       top: 50px;
+      width: 100%;
 
       li {
         margin: 0.5em 0 0.5em 0;

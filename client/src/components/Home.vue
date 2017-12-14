@@ -35,8 +35,10 @@ export default {
 
     } else {
       this.repos = apiResp.data
-      this.repos.forEach(function(repo) {
-        this.totalActiveRepo++
+      this.repos.forEach((repo) => {
+        if (repo.enabled) {
+          this.totalActiveRepo++
+        }
       })
     }    
   },
@@ -47,8 +49,7 @@ export default {
       } else {
         this.totalActiveRepo--
       }
-      console.log(repoId + ' => ' + enabled)
-      // /repo/enable/:repoId/:enable
+      RepoService.enable(repoId, enabled)
     }
   }
 };

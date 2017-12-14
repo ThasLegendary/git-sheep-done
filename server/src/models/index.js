@@ -19,6 +19,12 @@ fs.readdirSync(__dirname)
     db[file.slice(0, -3)] = sequelize.import(path.join(__dirname, file))
   })
 
+Object.keys(db).forEach((modelName) => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db)
+  }
+})
+
 db.sequelize = sequelize
 db.Sequelize = Sequelize
 

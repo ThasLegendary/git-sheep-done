@@ -14,5 +14,9 @@ module.exports = (sequelize, DataTypes) => {
     token: DataTypes.STRING
   })
 
+  User.associate = models => {
+    User.belongsToMany(models.Repo, {through: 'UserRepo'})
+  }
+
   return User
 }

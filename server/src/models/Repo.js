@@ -4,8 +4,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
-    },
-    enabled: DataTypes.BOOLEAN
+    }
   })
 
   return Repo
